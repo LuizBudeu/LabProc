@@ -27,7 +27,7 @@ class ARMCodeGenerator:
                     register.in_use = True
                     break
             else:
-                raise NoRegistersAvailable("No registers available")
+                raise NoRegistersAvailable(f"All {MAX_REGISTER_COUNT} registers are in use")
             
         return register
 
@@ -71,13 +71,14 @@ class ARMCodeGenerator:
         return self.result
 
 
-text = '(3 + 4 * (10 - 5) + 1)'  # 240
-lexer = Lexer(text)
-parser = Parser(lexer)
-ast = parser.parse()
+if __name__ == "__main__":
+    text = '(3 + 4 * (10 - 5) + 1)'  # 24
+    lexer = Lexer(text)
+    parser = Parser(lexer)
+    ast = parser.parse()
 
-code_generator = ARMCodeGenerator()
-code_generator.generate(ast)
-assembly_code = code_generator.get_assembly_code()
+    code_generator = ARMCodeGenerator()
+    code_generator.generate(ast)
+    assembly_code = code_generator.get_assembly_code()
 
-print(assembly_code)
+    print(assembly_code)
