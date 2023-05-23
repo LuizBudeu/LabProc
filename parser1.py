@@ -9,7 +9,7 @@ class InvalidSyntax(Exception):
 
 class AST:
     @staticmethod
-    def print_ast(node, level: int = 0):
+    def print_ast(node, level: int = 0) -> None:
         indent = '  ' * level
         if isinstance(node, BinOp):
             print(f'{indent}BinOp({node.op.type})')
@@ -20,12 +20,12 @@ class AST:
 
 
 class Num(AST):
-    def __init__(self, value: int):
+    def __init__(self, value: int) -> None:
         self.value = value
 
 
 class BinOp(AST):
-    def __init__(self, left: Branch, op: Token, right: Branch):
+    def __init__(self, left: Branch, op: Token, right: Branch) -> None:
         self.left = left
         self.op = op
         self.right = right
@@ -35,14 +35,14 @@ Branch = AST | BinOp | Num | None
 
 
 class Parser:
-    def __init__(self, lexer: Lexer):
+    def __init__(self, lexer: Lexer) -> None:
         self.lexer = lexer
         self.current_token = self.lexer.get_next_token()
 
-    def error(self):
+    def error(self) -> None:
         raise InvalidSyntax(f'Invalid syntax at position {self.lexer.pos}')
 
-    def eat(self, token_type: TokenType):
+    def eat(self, token_type: TokenType) -> None:
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
         else:

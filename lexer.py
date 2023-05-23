@@ -6,33 +6,33 @@ class InvalidCharacterException(Exception):
 
 
 class Lexer:
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         self.text = text
         self.pos = 0
         self.current_char = self.text[self.pos]
 
-    def error(self):
+    def error(self) -> None:
         raise InvalidCharacterException(f"Invalid character '{self.current_char}' at position {self.pos}")
 
-    def advance(self):
+    def advance(self) -> None:
         self.pos += 1
         if self.pos < len(self.text):
             self.current_char = self.text[self.pos]
         else:
             self.current_char = None
 
-    def skip_whitespace(self):
+    def skip_whitespace(self) -> None:
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
-    def integer(self):
+    def integer(self) -> int:
         result = ''
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
         return int(result)
 
-    def get_next_token(self):
+    def get_next_token(self) -> Token:
         while self.current_char is not None:
             if self.current_char.isspace():
                 self.skip_whitespace()
