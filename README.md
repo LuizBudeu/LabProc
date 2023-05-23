@@ -1,2 +1,2 @@
 # LabProc
-Projeto da disciplina PCS3732 2023
+Projeto da disciplina Laboratoório de Processadores (PCS3732) - Poli USP - 2023
