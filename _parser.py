@@ -9,14 +9,27 @@ class InvalidSyntax(Exception):
 
 class AST:
     @staticmethod
-    def print_ast(node, level: int = 0) -> None:
+    def _print_ast(node: Branch, level: int = 0) -> str:
+        # indent = '  ' * level
+        # if isinstance(node, BinOp):
+        #     print(f'{indent}BinOp({node.op.type})')
+        #     AST.print_ast(node.left, level + 1)
+        #     AST.print_ast(node.right, level + 1)
+        # elif isinstance(node, Num):
+        #     print(f'{indent}Num({node.value})')
+        
         indent = '  ' * level
         if isinstance(node, BinOp):
-            print(f'{indent}BinOp({node.op.type})')
-            AST.print_ast(node.left, level + 1)
-            AST.print_ast(node.right, level + 1)
+            left_str = AST._print_ast(node.left, level + 1)
+            right_str = AST._print_ast(node.right, level + 1)
+            return f'{indent}BinOp({node.op.type})\n{left_str}\n{right_str}'
         elif isinstance(node, Num):
-            print(f'{indent}Num({node.value})')
+            return f'{indent}Num({node.value})'
+        else:
+            return f'{indent}Unknown'
+            
+    def __str__(self) -> str:
+        return AST._print_ast(self)
 
 
 class Num(AST):
@@ -97,6 +110,6 @@ if __name__ == '__main__':
     parser = Parser(lexer)
     ast = parser.parse()
 
-    AST.print_ast(ast)
+    print(ast)
 
 

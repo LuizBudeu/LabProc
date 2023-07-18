@@ -75,13 +75,14 @@ class ARMCodeGenerator:
 
 
 if __name__ == "__main__":
-    text = '(3 + 4 * (10 - 5) + 1)'  # 24
+    text = '(3 + 4 * (10 - 5) + 1) * (10 - 3)'  # 168
     text2 = '3 - 5'
     lexer = Lexer(text)
     parser = Parser(lexer)
     ast = parser.parse()
 
-    print(AST.print_ast(ast))
+    print(ast)
+    print()
 
     code_generator = ARMCodeGenerator()
     code_generator.generate(ast)
