@@ -1,5 +1,5 @@
 from __future__ import annotations
-from token1 import Token, TokenType
+from _token import Token, TokenType
 from lexer import Lexer
 
 

@@ -1,6 +1,6 @@
 from lexer import Lexer
-from token1 import TokenType
-from parser1 import Parser, Num, BinOp, Branch
+from _token import TokenType
+from _parser import Parser, Num, BinOp, Branch, AST
 from register import Register, RegisterDoesntExist, NoRegistersAvailable
 
 
@@ -12,23 +12,25 @@ class ARMCodeGenerator:
         self.register_bank = [Register(i) for i in range(MAX_REGISTER_COUNT)]
         self.result = ""
 
-    def get_register(self , register_id: int | None = None) -> Register:
+    def get_register(self, register_id: int | None = None) -> Register:
         if register_id is not None:
             try:
                 register = self.register_bank[register_id]
             except IndexError:
-                raise RegisterDoesntExist(f"Register {register_id} doesn't exist")
-            
+                raise RegisterDoesntExist(
+                    f"Register {register_id} doesn't exist")
+
             register.in_use = True
-            
+
         else:
             for register in self.register_bank:
                 if not register.in_use:
                     register.in_use = True
                     break
             else:
-                raise NoRegistersAvailable(f"All {MAX_REGISTER_COUNT} registers are in use")
-            
+                raise NoRegistersAvailable(
+                    f"All {MAX_REGISTER_COUNT} registers are in use")
+
         return register
 
     def release_register(self, register: Register) -> None:
@@ -40,7 +42,7 @@ class ARMCodeGenerator:
             self.result += f"    MOV {register}, #{node.value}\n"
             register.content = node.value
             return register
-        
+
         elif isinstance(node, BinOp):
             left_register = self.generate(node.left)
             right_register = self.generate(node.right)
@@ -59,11 +61,12 @@ class ARMCodeGenerator:
                 self.result += f"    SDIV {result_register}, {left_register}, {right_register}\n"
                 result_register.content = left_register.content // right_register.content
 
-            self.release_register(left_register)  # Release registers used by children
+            # Release registers used by children
+            self.release_register(left_register)
             self.release_register(right_register)
 
             return result_register
-        
+
         else:
             raise TypeError(f"Invalid node type: {type(node)}")
 
@@ -73,9 +76,12 @@ class ARMCodeGenerator:
 
 if __name__ == "__main__":
     text = '(3 + 4 * (10 - 5) + 1)'  # 24
+    text2 = '3 - 5'
     lexer = Lexer(text)
     parser = Parser(lexer)
     ast = parser.parse()
+
+    print(AST.print_ast(ast))
 
     code_generator = ARMCodeGenerator()
     code_generator.generate(ast)
