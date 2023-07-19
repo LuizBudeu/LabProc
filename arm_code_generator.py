@@ -1,6 +1,6 @@
 from lexer import Lexer
 from _token import TokenType
-from _parser import Parser, Num, BinOp, Branch, AST
+from _parser import Parser, Num, BinOp, Node, AST
 from register import Register, RegisterDoesntExist, NoRegistersAvailable
 
 
@@ -36,7 +36,7 @@ class ARMCodeGenerator:
     def release_register(self, register: Register) -> None:
         register.in_use = False
 
-    def generate(self, node: Branch) -> Register:
+    def generate(self, node: Node) -> Register:
         if isinstance(node, Num):
             register = self.get_register()
             self.result += f"    MOV {register}, #{node.value}\n"

@@ -8,8 +8,9 @@ class InvalidSyntax(Exception):
 
 
 class AST:
+    
     @staticmethod
-    def _print_ast(node: Branch, level: int = 0) -> str:
+    def _print_ast(node: Node, level: int = 0) -> str:
         # indent = '  ' * level
         # if isinstance(node, BinOp):
         #     print(f'{indent}BinOp({node.op.type})')
@@ -23,28 +24,43 @@ class AST:
             left_str = AST._print_ast(node.left, level + 1)
             right_str = AST._print_ast(node.right, level + 1)
             return f'{indent}BinOp({node.op.type})\n{left_str}\n{right_str}'
+        
         elif isinstance(node, Num):
             return f'{indent}Num({node.value})'
+        
         else:
             return f'{indent}Unknown'
             
-    def __str__(self) -> str:
-        return AST._print_ast(self)
+    # def __str__(self) -> str:
+    #     return AST._print_ast(self)
+
 
 
 class Num(AST):
     def __init__(self, value: int) -> None:
         self.value = value
+        
+    # def __str__(self) -> str:
+    #     return f'{self.value}'
+    
+    def as_string(self):
+        return str(self.value)
 
 
 class BinOp(AST):
-    def __init__(self, left: Branch, op: Token, right: Branch) -> None:
+    def __init__(self, left: Node, op: Token, right: Node) -> None:
         self.left = left
         self.op = op
         self.right = right
+        
+    # def __str__(self) -> str:
+    #     return f'({self.left} {self.op.type} {self.right})'
+    
+    def as_string(self):
+        return self.op.value
 
 
-Branch = AST | BinOp | Num | None
+Node = AST | BinOp | Num | None
 
 
 class Parser:
@@ -61,7 +77,7 @@ class Parser:
         else:
             self.error()
 
-    def factor(self) -> Branch:
+    def factor(self) -> Node:
         token = self.current_token
         if token.type == TokenType.INTEGER:
             self.eat(TokenType.INTEGER)
@@ -72,7 +88,7 @@ class Parser:
             self.eat(TokenType.RPAREN)
             return node
 
-    def term(self) -> Branch:
+    def term(self) -> Node:
         node = self.factor()
 
         while self.current_token.type in (TokenType.MULTIPLY, TokenType.DIVIDE):
@@ -86,7 +102,7 @@ class Parser:
 
         return node
 
-    def expr(self) -> Branch:
+    def expr(self) -> Node:
         node = self.term()
 
         while self.current_token.type in (TokenType.PLUS, TokenType.MINUS):
@@ -100,7 +116,7 @@ class Parser:
 
         return node
 
-    def parse(self) -> Branch:
+    def parse(self) -> Node:
         return self.expr()
     
     
@@ -111,5 +127,26 @@ if __name__ == '__main__':
     ast = parser.parse()
 
     print(ast)
+    
+    print()
+        
+    
+    
+    # def operation_order(ast):
+    #     def dfs_reverse(node, result_list, indent_level):
+    #         if isinstance(node, Num):
+    #             result_list.append((indent_level, node.value))
+    #         elif isinstance(node, BinOp):
+    #             dfs_reverse(node.right, result_list, indent_level + 1)
+    #             result_list.append((indent_level, node.op))
+    #             dfs_reverse(node.left, result_list, indent_level + 1)
+
+    #     ordered_list = []
+    #     dfs_reverse(ast, ordered_list, 0)
+    #     return [value for _, value in ordered_list]
+
+    # ordered_list = operation_order(ast)
+    # print(ordered_list)
+    print()
 
 
