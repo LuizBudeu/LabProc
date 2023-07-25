@@ -8,7 +8,7 @@ class InvalidSyntax(Exception):
 
 
 class AST:
-    
+
     @staticmethod
     def _print_ast(node: Node, level: int = 0) -> str:
         # indent = '  ' * level
@@ -18,31 +18,30 @@ class AST:
         #     AST.print_ast(node.right, level + 1)
         # elif isinstance(node, Num):
         #     print(f'{indent}Num({node.value})')
-        
+
         indent = '  ' * level
         if isinstance(node, BinOp):
             left_str = AST._print_ast(node.left, level + 1)
             right_str = AST._print_ast(node.right, level + 1)
             return f'{indent}BinOp({node.op.type})\n{left_str}\n{right_str}'
-        
+
         elif isinstance(node, Num):
             return f'{indent}Num({node.value})'
-        
+
         else:
             return f'{indent}Unknown'
-            
-    # def __str__(self) -> str:
-    #     return AST._print_ast(self)
 
+    def __str__(self) -> str:
+        return AST._print_ast(self)
 
 
 class Num(AST):
     def __init__(self, value: int) -> None:
         self.value = value
-        
+
     # def __str__(self) -> str:
     #     return f'{self.value}'
-    
+
     def as_string(self):
         return str(self.value)
 
@@ -52,10 +51,10 @@ class BinOp(AST):
         self.left = left
         self.op = op
         self.right = right
-        
+
     # def __str__(self) -> str:
     #     return f'({self.left} {self.op.type} {self.right})'
-    
+
     def as_string(self):
         return self.op.value
 
@@ -81,7 +80,7 @@ class Parser:
         token = self.current_token
         if token.type == TokenType.INTEGER:
             self.eat(TokenType.INTEGER)
-            return Num(int(token.value)) 
+            return Num(int(token.value))
         elif token.type == TokenType.LPAREN:
             self.eat(TokenType.LPAREN)
             node = self.expr()
@@ -118,8 +117,8 @@ class Parser:
 
     def parse(self) -> Node:
         return self.expr()
-    
-    
+
+
 if __name__ == '__main__':
     text = '3 + 4 * (10 - 5 / (1*2 - 4))'
     lexer = Lexer(text)
@@ -127,11 +126,9 @@ if __name__ == '__main__':
     ast = parser.parse()
 
     print(ast)
-    
+
     print()
-        
-    
-    
+
     # def operation_order(ast):
     #     def dfs_reverse(node, result_list, indent_level):
     #         if isinstance(node, Num):
@@ -148,5 +145,3 @@ if __name__ == '__main__':
     # ordered_list = operation_order(ast)
     # print(ordered_list)
     print()
-
-

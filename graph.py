@@ -44,7 +44,7 @@ def ascii_visualize_tree(node, prefix="", is_left=None):
 # Build the tree
 # root = build_tree()
 
-text = '3 + 4 * (10 - 5 / (1*2 - 4))'
+text = '(3 + 4 * (10 - 5) + 1) * (10 - 3)'  # 168
 lexer = Lexer(text)
 parser = Parser(lexer)
 root = parser.parse()
