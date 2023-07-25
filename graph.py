@@ -1,69 +1,53 @@
-import networkx as nx
 from _parser import BinOp, Num, Parser, Lexer
 
 
-# def ast_to_graph(ast):
-#     graph = nx.DiGraph()
-
-#     def dfs(node, parent=None):
-#         if isinstance(node, BinOp):
-#             graph.add_node(node, label=node.op)
-#             if parent:
-#                 graph.add_edge(parent, node)
-#             dfs(node.left, node)
-#             dfs(node.right, node)
-#         elif isinstance(node, Num):
-#             graph.add_node(node, label=str(node.value))
-#             if parent:
-#                 graph.add_edge(parent, node)
-
-#     dfs(ast)
-#     return graph
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
 
 
-# import matplotlib.pyplot as plt
+def build_tree():
+    # Create the nodes
+    n1 = Node("+")
+    n2 = Node(5)
+    n3 = Node("x")
+    n4 = Node(3)
+    n5 = Node(4)
 
-# def visualize_ast(graph):
-#     pos = nx.nx_pydot.graphviz_layout(graph, prog="dot")
-#     labels = nx.get_node_attributes(graph, "label")
+    # Connect the nodes to build the tree
+    n1.left = n2
+    n1.right = n3
+    n3.left = n4
+    n3.right = n5
 
-#     plt.figure(figsize=(10, 6))
-#     nx.draw(graph, pos, with_labels=True, labels=labels, node_size=1500, font_size=12, font_weight="bold", node_color="lightblue", arrowsize=20)
-#     plt.show()
-
-
-
-# text = '3 + 4 * (10 - 5 / (1*2 - 4))'
-# lexer = Lexer(text)
-# parser = Parser(lexer)
-# ast = parser.parse()
-# ast_graph = ast_to_graph(ast)
-# print(ast_graph)
-# visualize_ast(ast_graph)
+    return n1
 
 
+def ascii_visualize_tree(node, prefix="", is_left=None):
+    if node is None:
+        return
 
-import networkx as nx
-import matplotlib.pyplot as plt
+    if type(node) is BinOp:
+        data = node.op.value
+    else:
+        data = node.value
+    if isinstance(data, str):
+        ascii_visualize_tree(node.left, prefix + "    ", True)
+        print(prefix + ("|-- " if is_left is True else "\\-- ") + str(data))
+        ascii_visualize_tree(node.right, prefix + "    ", False)
+    else:
+        print(prefix + ("|-- " if is_left is True else "\\-- ") + str(data))
 
-def build_graph(node, graph):
-    if isinstance(node, Num):
-        graph.add_node(id(node), label=node.as_string())
-    elif isinstance(node, BinOp):
-        graph.add_node(id(node), label=node.as_string())
-        build_graph(node.left, graph)
-        build_graph(node.right, graph)
-        graph.add_edge(id(node), id(node.left))
-        graph.add_edge(id(node), id(node.right))
-        
-text = '3 + 4 * (10 - 5)'
+
+# Build the tree
+# root = build_tree()
+
+text = '3 + 4 * (10 - 5 / (1*2 - 4))'
 lexer = Lexer(text)
 parser = Parser(lexer)
-ast = parser.parse()
+root = parser.parse()
 
-G = nx.DiGraph()
-build_graph(ast, G)
-
-pos = nx.drawing.nx_agraph.graphviz_layout(G, prog='dot')
-nx.draw(G, pos, with_labels=True, node_size=1500, node_color="skyblue", font_size=10, font_weight="bold", arrowsize=20)
-plt.show()
+# Visualize the tree
+ascii_visualize_tree(root)
