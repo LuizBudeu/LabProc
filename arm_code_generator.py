@@ -17,8 +17,7 @@ class ARMCodeGenerator:
             try:
                 register = self.register_bank[register_id]
             except IndexError:
-                raise RegisterDoesntExist(
-                    f"Register {register_id} doesn't exist")
+                raise RegisterDoesntExist(f"Register {register_id} doesn't exist")
 
             register.in_use = True
 
@@ -28,13 +27,24 @@ class ARMCodeGenerator:
                     register.in_use = True
                     break
             else:
-                raise NoRegistersAvailable(
-                    f"All {MAX_REGISTER_COUNT} registers are in use")
+                raise NoRegistersAvailable(f"All {MAX_REGISTER_COUNT} registers are in use")
 
         return register
 
     def release_register(self, register: Register) -> None:
         register.in_use = False
+        
+    def reserve_registers(self, count: int) -> list[Register]:
+        reserved_registers = []
+        for register in self.register_bank:
+            if not register.in_use:
+                reserved_registers.append(register)
+                register.in_use = True
+                if len(reserved_registers) == count:
+                    return reserved_registers
+                
+        raise Exception("Not enough available registers for reservation")
+
 
     def generate(self, node: Node) -> Register:
         if isinstance(node, Num):
@@ -51,14 +61,26 @@ class ARMCodeGenerator:
             if node.op.type == TokenType.PLUS:
                 self.result += f"    ADD {result_register}, {left_register}, {right_register}\n"
                 result_register.content = left_register.content + right_register.content
+                
             elif node.op.type == TokenType.MINUS:
                 self.result += f"    SUB {result_register}, {left_register}, {right_register}\n"
                 result_register.content = left_register.content - right_register.content
+                
             elif node.op.type == TokenType.MULTIPLY:
                 self.result += f"    MUL {result_register}, {left_register}, {right_register}\n"
                 result_register.content = left_register.content * right_register.content
+                
             elif node.op.type == TokenType.DIVIDE:
-                self.result += f"    SDIV {result_register}, {left_register}, {right_register}\n"
+                self.result += f"    MOV r1, {left_register}  ;@ dividendo\n"
+                self.result += f"    MOV r0, {right_register}  ;@ divisor\n"
+                self.result += f"    bl _divide\n"
+                self.result += f"    MOV {result_register}, r3  ;@ resultado\n"
+                
+                # Reset registers used by division
+                for i in range(4):
+                    reg = self.register_bank[i]
+                    reg.content = 0  
+                
                 result_register.content = left_register.content // right_register.content
 
             # Release registers used by children
@@ -75,16 +97,20 @@ class ARMCodeGenerator:
 
 
 if __name__ == "__main__":
-    text = '(3 + 4 * (10 - 5) + 1) * (10 - 3)'  # 168
-    text2 = '3 - 5'
+    text = '(3 + 4 * (10 - 5) + 1) * (10 - 3) / 3'  # 56
+    # text = '(3 / 2) + 10 / 2 '
     lexer = Lexer(text)
     parser = Parser(lexer)
     ast = parser.parse()
 
-    print(ast)
-    print()
+    # print(ast)
+    # print()
 
     code_generator = ARMCodeGenerator()
+    
+    if '/' in text:
+        code_generator.reserve_registers(5)  # Reserve R0-R4 for division function
+        
     code_generator.generate(ast)
     assembly_code = code_generator.get_assembly_code()
 
