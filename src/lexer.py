@@ -1,4 +1,4 @@
-from _token import Token, TokenType
+from ._token import Token, TokenType
 
 
 class InvalidCharacterException(Exception):

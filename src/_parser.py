@@ -1,6 +1,6 @@
 from __future__ import annotations
-from _token import Token, TokenType
-from lexer import Lexer
+from ._token import Token, TokenType
+from .lexer import Lexer
 
 
 class InvalidSyntax(Exception):

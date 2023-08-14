@@ -1,7 +1,7 @@
-from lexer import Lexer
-from _token import TokenType
-from _parser import Parser, Num, BinOp, Node, AST
-from register import Register, RegisterDoesntExist, NoRegistersAvailable
+from .lexer import Lexer
+from ._token import TokenType
+from ._parser import Parser, Num, BinOp, Node, AST
+from .register import Register, RegisterDoesntExist, NoRegistersAvailable
 
 
 MAX_REGISTER_COUNT = 15
@@ -30,6 +30,13 @@ class ARMCodeGenerator:
                 raise NoRegistersAvailable(f"All {MAX_REGISTER_COUNT} registers are in use")
 
         return register
+    
+    def get_final_register(self) -> Register:
+        for register in self.register_bank:
+            if register.in_use:
+                return register
+        else:
+            raise Exception(f"Can't find final register")
 
     def release_register(self, register: Register) -> None:
         register.in_use = False
@@ -44,7 +51,6 @@ class ARMCodeGenerator:
                     return reserved_registers
                 
         raise Exception("Not enough available registers for reservation")
-
 
     def generate(self, node: Node) -> Register:
         if isinstance(node, Num):
@@ -93,18 +99,17 @@ class ARMCodeGenerator:
             raise TypeError(f"Invalid node type: {type(node)}")
 
     def get_assembly_code(self) -> str:
+        result_register = self.get_final_register()
+        self.result += f"    MOV r0, {result_register}\n"
         return self.result
 
 
 if __name__ == "__main__":
-    text = '(3 + 4 * (10 - 5) + 1) * (10 - 3) / 3'  # 56
-    # text = '(3 / 2) + 10 / 2 '
+    # text = '(3 + 4 * (10 - 5) + 1) * (10 - 3)'  # 168
+    text = '(1 - 4 / 2) - 10 / 2 '  # -6
     lexer = Lexer(text)
     parser = Parser(lexer)
     ast = parser.parse()
-
-    # print(ast)
-    # print()
 
     code_generator = ARMCodeGenerator()
     
@@ -112,6 +117,11 @@ if __name__ == "__main__":
         code_generator.reserve_registers(5)  # Reserve R0-R4 for division function
         
     code_generator.generate(ast)
+    
+    if '/' in text:
+        for i in range(5):
+            code_generator.release_register(code_generator.register_bank[i])
+    
     assembly_code = code_generator.get_assembly_code()
 
     print(assembly_code)
