@@ -105,8 +105,8 @@ class ARMCodeGenerator:
 
 
 if __name__ == "__main__":
-    # text = '(3 + 4 * (10 - 5) + 1) * (10 - 3)'  # 168
-    text = '(1 - 4 / 2) - 10 / 2 '  # -6
+    text = '(3 + 4 * (10 - 5) + 1) * (10 - 3)'  # 168
+    # text = '(1 - 4 / 2) - 10 / 2 '  # -6
     lexer = Lexer(text)
     parser = Parser(lexer)
     ast = parser.parse()
