@@ -1,4 +1,4 @@
-# Projeto da disciplina Laboratoório de Processadores (PCS3732) - Poli USP - 2023
+# Projeto da disciplina Laboratório de Processadores (PCS3732) - Poli USP - 2023
 
 ## Integrantes:
 
@@ -6,7 +6,7 @@ Luiz Guilherme Budeu - NUSP: 11821639
 
 ## Descrição:
 
-Esse projeto consiste em um Compilador de Expressões Aritméticas para ARMv7 Assembly. A notação da expressão artimética deve ser infixa (exemplo: 1 + 2 \* 3 - (4/2)). A documentação completa do projeto pode ser localizada no relatório pdf na pasta docs.
+Esse projeto consiste em um Compilador de Expressões Aritméticas para ARMv7 Assembly. A notação da expressão artimética deve ser infixa (exemplo: 1 + 2 \* 3 - (4/2)). A documentação completa do projeto pode ser localizada no relatório pdf na pasta `docs`.
 
 ## Execução:
 
